@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DROP — Prête, échange, partage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080a;
+    --bg-soft:#0d0f12;
+    --glass:rgba(255,255,255,0.055);
+    --glass-strong:rgba(255,255,255,0.09);
+    --glass-border:rgba(255,255,255,0.14);
+    --text:#f3f4f6;
+    --text-dim:#9aa0ab;
+    --text-faint:#5f6470;
+    --silver-1:#ffffff;
+    --silver-2:#c7cdd6;
+    --silver-3:#7d8493;
+    --accent:#cfd8e6;
+    --accent-glow:rgba(207,216,230,0.35);
+    --danger:#e0736b;
+    --ok:#8fd6b0;
+    --radius:20px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(120,130,160,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 15%, rgba(160,170,190,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{ background:rgba(207,216,230,0.3); }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+  input, textarea, select{ font-family:inherit; }
+
+  /* ---------- Glass utility ---------- */
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(22px) saturate(140%);
+    -webkit-backdrop-filter:blur(22px) saturate(140%);
+    border:1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  /* ---------- Top nav ---------- */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px;
+  }
+  .nav-inner{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px; border-radius:100px;
+  }
+  .nav-logo{
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.25rem; letter-spacing:0.5px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .nav-logo .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:linear-gradient(160deg,#fff,#8b93a3);
+    box-shadow:0 0 12px var(--accent-glow);
+  }
+  .nav-actions{ display:flex; align-items:center; gap:10px; }
+  .btn{
+    border:none; border-radius:100px; padding:10px 18px;
+    font-size:0.85rem; font-weight:600; color:var(--text);
+    transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
+    white-space:nowrap;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn-ghost{
+    background:var(--glass); border:1px solid var(--glass-border);
+  }
+  .btn-ghost:hover{ background:var(--glass-strong); }
+  .btn-solid{
+    background:linear-gradient(160deg,#ffffff,#c9cfd9);
+    color:#0a0b0d; font-weight:700;
+  }
+  .btn-solid:hover{ box-shadow:0 0 24px var(--accent-glow); }
+  .btn-danger{ background:rgba(224,115,107,0.15); color:#f2a49d; border:1px solid rgba(224,115,107,0.3);}
+
+  .avatar{
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(160deg,#3a3d44,#1b1d21);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.85rem; border:1px solid var(--glass-border);
+    overflow:hidden;
+  }
+  .avatar img{ width:100%; height:100%; object-fit:cover; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:120px 20px 40px;
+    position:relative;
+  }
+  .hero-eyebrow{
+    font-size:0.78rem; letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-dim); margin-bottom:22px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after{
+    content:''; width:26px; height:1px; background:var(--glass-border);
+  }
+  .logo-big{
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:clamp(4.5rem, 17vw, 11.5rem);
+    line-height:0.85; letter-spacing:-4px;
+    background:linear-gradient(180deg, #ffffff 15%, #c7cdd6 55%, #6b7280 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 40px rgba(200,210,225,0.18));
+    position:relative;
+  }
+  .logo-big::after{
+    content:'DROP';
+    position:absolute; left:0; top:0; width:100%;
+    background:linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:100% 300%;
+    animation:shimmer 6s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes shimmer{
+    0%{ background-position:0 -100%; }
+    50%{ background-position:0 200%; }
+    100%{ background-position:0 200%; }
+  }
+  .hero-tag{
+    margin-top:22px; font-size:1.05rem; color:var(--text-dim);
+    max-width:520px; line-height:1.55; font-weight:400;
+  }
+  .hero-tag b{ color:var(--text); font-weight:600; }
+
+  /* search pill */
+  .search-wrap{
+    margin-top:56px; width:min(640px, 90vw);
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .search-bar{
+    display:flex; align-items:center; gap:12px;
+    padding:8px 8px 8px 22px; border-radius:100px;
+  }
+  .search-bar svg{ flex-shrink:0; opacity:0.6; }
+  .search-bar input{
+    flex:1; background:transparent; border:none; outline:none;
+    color:var(--text); font-size:1rem; padding:12px 0;
+  }
+  .search-bar input::placeholder{ color:var(--text-faint); }
+  .search-bar .btn{ flex-shrink:0; }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .chip{
+    padding:7px 14px; border-radius:100px; font-size:0.78rem;
+    color:var(--text-dim); cursor:pointer; transition:all .15s ease;
+  }
+  .chip:hover{ color:var(--text); background:var(--glass-strong); }
+
+  .scroll-hint{
+    position:absolute; bottom:28px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    color:var(--text-faint); font-size:0.72rem; letter-spacing:2px; text-transform:uppercase;
+  }
+  .scroll-hint .line{ width:1px; height:30px; background:linear-gradient(var(--glass-border), transparent); animation:pulse-line 2s ease-in-out infinite; }
+  @keyframes pulse-line{ 0%,100%{opacity:.3;} 50%{opacity:1;} }
+
+  /* ---------- Sections ---------- */
+  .section{ max-width:1180px; margin:0 auto; padding:70px 24px 30px; }
+  .section-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    margin-bottom:30px; gap:20px; flex-wrap:wrap;
+  }
+  .section-title{
+    font-family:'Syne',sans-serif; font-weight:700; font-size:1.9rem; letter-spacing:-0.5px;
+  }
+  .section-sub{ color:var(--text-dim); font-size:0.9rem; margin-top:6px; }
+  .loc-status{
+    font-size:0.8rem; color:var(--text-dim); display:flex; align-items:center; gap:8px;
+    padding:8px 14px; border-radius:100px;
+  }
+  .loc-status .dot{ width:6px; height:6px; border-radius:50%; background:var(--ok); }
+  .loc-status.off .dot{ background:var(--text-faint); }
+
+  /* ---------- Grid / cards ---------- */
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+    gap:18px;
+  }
+  .card{
+    border-radius:var(--radius); overflow:hidden; cursor:pointer;
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    display:flex; flex-direction:column;
+  }
+  .card:hover{ transform:translateY(-4px); border-color:rgba(255,255,255,0.28); }
+  .card-img{
+    height:170px; width:100%; object-fit:cover; display:block;
+    background:linear-gradient(160deg,#16181c,#0b0c0e);
+  }
+  .card-img-placeholder{
+    height:170px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#16181c,#0b0c0e);
+  }
+  .card-body{ padding:16px 18px 18px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .card-title{ font-weight:700; font-size:1.02rem; line-height:1.3; }
+  .badge{
+    font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    padding:4px 9px; border-radius:100px; white-space:nowrap; flex-shrink:0;
+  }
+  .badge-pret{ background:rgba(207,216,230,0.15); color:#dde3ec; border:1px solid rgba(207,216,230,0.25); }
+  .badge-echange{ background:rgba(143,214,176,0.13); color:#a8e2c3; border:1px solid rgba(143,214,176,0.25); }
+  .card-desc{ font-size:0.83rem; color:var(--text-dim); line-height:1.45; flex:1;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card-meta{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:0.75rem; color:var(--text-faint); margin-top:4px; padding-top:10px;
+    border-top:1px solid var(--glass-border);
+  }
+  .card-owner{ display:flex; align-items:center; gap:6px; }
+
+  .empty{
+    text-align:center; padding:60px 20px; color:var(--text-dim);
+    border-radius:var(--radius);
+  }
+  .empty svg{ opacity:0.35; margin-bottom:14px; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align:center; padding:60px 20px 40px; color:var(--text-faint); font-size:0.8rem;
+  }
+  footer .fdrop{ font-family:'Syne',sans-serif; font-weight:800; color:var(--text-dim); letter-spacing:1px; }
+
+  /* ---------- FAB publish ---------- */
+  .fab{
+    position:fixed; bottom:26px; right:26px; z-index:90;
+    width:58px; height:58px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#ffffff,#c9cfd9);
+    box-shadow:0 8px 30px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.2);
+    transition:transform .2s ease;
+  }
+  .fab:hover{ transform:scale(1.08) rotate(90deg); }
+  .fab svg{ stroke:#0a0b0d; }
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center; padding:20px;
+    background:rgba(5,6,8,0.7); backdrop-filter:blur(6px);
+    animation:fadein .2s ease;
+  }
+  .overlay.active{ display:flex; }
+  @keyframes fadein{ from{opacity:0;} to{opacity:1;} }
+  .modal{
+    width:100%; max-width:460px; border-radius:24px; padding:32px;
+    position:relative; max-height:88vh; overflow-y:auto;
+    animation:modalin .25s cubic-bezier(.2,.9,.3,1);
+  }
+  .modal.wide{ max-width:640px; }
+  @keyframes modalin{ from{ transform:translateY(16px) scale(.98); opacity:0; } to{ transform:none; opacity:1; } }
+  .modal-close{
+    position:absolute; top:20px; right:20px; width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; background:var(--glass);
+    border:1px solid var(--glass-border);
+  }
+  .modal h2{ font-family:'Syne',sans-serif; font-weight:700; font-size:1.5rem; margin-bottom:6px; }
+  .modal-sub{ color:var(--text-dim); font-size:0.85rem; margin-bottom:24px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:0.78rem; color:var(--text-dim); margin-bottom:7px; font-weight:500; }
+  .field input, .field textarea, .field select{
+    width:100%; background:rgba(255,255,255,0.045); border:1px solid var(--glass-border);
+    border-radius:var(--radius-sm); padding:12px 14px; color:var(--text); font-size:0.92rem;
+    outline:none; transition:border-color .15s ease;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{ border-color:rgba(255,255,255,0.4); }
+  .field textarea{ resize:vertical; min-height:80px; }
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+
+  .type-toggle{ display:flex; gap:10px; }
+  .type-opt{
+    flex:1; padding:12px; border-radius:var(--radius-sm); text-align:center;
+    border:1px solid var(--glass-border); background:rgba(255,255,255,0.03);
+    font-size:0.85rem; font-weight:600; color:var(--text-dim); transition:all .15s ease;
+  }
+  .type-opt.active{ background:rgba(255,255,255,0.1); color:var(--text); border-color:rgba(255,255,255,0.35); }
+
+  .img-drop{
+    border:1.5px dashed var(--glass-border); border-radius:var(--radius-sm);
+    padding:22px; text-align:center; color:var(--text-faint); font-size:0.82rem;
+    cursor:pointer; position:relative; overflow:hidden; min-height:90px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px;
+  }
+  .img-drop img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .img-drop input{ display:none; }
+
+  .divider-or{ display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--text-faint); font-size:0.78rem; }
+  .divider-or::before, .divider-or::after{ content:''; flex:1; height:1px; background:var(--glass-border); }
+
+  .btn-google{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--glass-border); color:var(--text);
+    padding:12px; border-radius:var(--radius-sm); font-weight:600; font-size:0.88rem;
+  }
+  .btn-google:hover{ background:var(--glass-strong); }
+  .btn-full{ width:100%; padding:13px; border-radius:var(--radius-sm); font-size:0.9rem; }
+
+  .auth-toggle{ text-align:center; margin-top:16px; font-size:0.83rem; color:var(--text-dim); }
+  .auth-toggle span{ color:var(--text); font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+
+  .form-error{
+    font-size:0.8rem; color:var(--danger); background:rgba(224,115,107,0.1);
+    border:1px solid rgba(224,115,107,0.25); border-radius:var(--radius-sm);
+    padding:9px 12px; margin-bottom:14px; display:none;
+  }
+  .form-error.show{ display:block; }
+
+  /* detail modal */
+  .detail-img{ width:100%; height:260px; object-fit:cover; border-radius:var(--radius-sm); margin-bottom:20px; background:linear-gradient(160deg,#16181c,#0b0c0e); }
+  .detail-owner{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .detail-owner-name{ font-weight:600; font-size:0.92rem; }
+  .detail-owner-loc{ font-size:0.78rem; color:var(--text-dim); }
+  .detail-desc{ color:var(--text-dim); font-size:0.9rem; line-height:1.6; margin-bottom:20px; white-space:pre-wrap; }
+  .detail-info{ display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+  .info-pill{ font-size:0.78rem; padding:7px 13px; border-radius:100px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:var(--text-dim); }
+
+  .chat-box{ border-radius:var(--radius-sm); padding:14px; }
+  .chat-msgs{ max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+  .msg{ max-width:80%; padding:9px 13px; border-radius:14px; font-size:0.85rem; line-height:1.4; }
+  .msg.mine{ align-self:flex-end; background:rgba(255,255,255,0.14); border-bottom-right-radius:4px; }
+  .msg.theirs{ align-self:flex-start; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-bottom-left-radius:4px; }
+  .chat-input-row{ display:flex; gap:8px; }
+  .chat-input-row input{ flex:1; }
+
+  .toast-wrap{ position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:400; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .toast{
+    padding:12px 20px; border-radius:100px; font-size:0.85rem; font-weight:500;
+    animation:toastin .25s ease;
+  }
+  @keyframes toastin{ from{ opacity:0; transform:translateY(-10px);} to{opacity:1; transform:none;} }
+
+  @media (max-width:640px){
+    .nav{ padding:14px 14px; }
+    .nav-inner{ padding:8px 10px; }
+    .nav-actions .btn span{ display:none; }
+    .logo-big{ letter-spacing:-2px; }
+    .section{ padding:50px 16px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<div class="nav">
+  <div class="nav-inner glass">
+    <div class="nav-logo"><span class="dot"></span>DROP</div>
+    <div class="nav-actions" id="navActions">
+      <button class="btn btn-ghost" id="btnLogin">Connexion</button>
+      <button class="btn btn-solid" id="btnPublishNav">Publier</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-eyebrow">Prêter · échanger · sans argent</div>
+  <h1 class="logo-big">DROP</h1>
+  <p class="hero-tag">L'objet dont tu as besoin, quelqu'un près de chez toi l'a déjà. <b>Trouve-le, emprunte-le, rends-le.</b></p>
+
+  <div class="search-wrap">
+    <div class="search-bar glass">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Quel objet cherches-tu ? (perceuse, robe de soirée, vélo...)">
+      <button class="btn btn-solid" id="btnSearch">Chercher</button>
+    </div>
+    <div class="chips">
+      <div class="chip" data-chip="Bricolage">🔧 Bricolage</div>
+      <div class="chip" data-chip="Jardin">🌿 Jardin</div>
+      <div class="chip" data-chip="Cuisine">🍳 Cuisine</div>
+      <div class="chip" data-chip="Sport">🏀 Sport</div>
+      <div class="chip" data-chip="Livre">📚 Livres</div>
+      <div class="chip" data-chip="Enfant">🧸 Enfants</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint"><span>Explorer</span><div class="line"></div></div>
+</section>
+
+<!-- ===== LISTINGS ===== -->
+<section class="section" id="results">
+  <div class="section-head">
+    <div>
+      <div class="section-title" id="resultsTitle">Autour de toi</div>
+      <div class="section-sub" id="resultsSub">Les objets les plus proches disponibles maintenant</div>
+    </div>
+    <div class="loc-status off glass" id="locStatus"><span class="dot"></span><span id="locStatusText">Localisation désactivée</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<footer>
+  <div class="fdrop">DROP</div>
+  <div style="margin-top:8px;">Prête un objet, économise une vie. Aucun paiement — juste des gens.</div>
+</footer>
+
+<!-- FAB -->
+<div class="fab" id="fabPublish">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="overlay" id="authOverlay">
+  <div class="modal glass">
+    <div class="modal-close" id="closeAuth">✕</div>
+    <h2 id="authTitle">Content de te revoir</h2>
+    <div class="modal-sub" id="authSub">Connecte-toi pour emprunter, échanger et publier.</div>
+    <div class="form-error" id="authError"></div>
+
+    <div class="field" id="fieldName" style="display:none;">
+      <label>Prénom</label>
+      <input type="text" id="authName" placeholder="Ton prénom">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="toi@exemple.com">
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="authPassword" placeholder="••••••••">
+    </div>
+    <button class="btn btn-solid btn-full" id="btnAuthSubmit">Se connecter</button>
+
+    <div class="divider-or">ou</div>
+    <button class="btn-google" id="btnGoogle">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.5 29.6 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.3-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.6 18.9 12.5 24 12.5c3.1 0 5.8 1.1 8 3l6-6C34.6 5.5 29.6 3.5 24 3.5c-7.5 0-14 4.2-17.7 11.2z"/><path fill="#4CAF50" d="M24 44.5c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.4c-2 1.4-4.6 2.3-7.7 2.3-5.3 0-9.7-3.4-11.3-8.1l-6.7 5.2C9.9 40.2 16.4 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.4C41.4 35.9 44.5 30.5 44.5 24c0-1.2-.1-2.4-.3-3.5z"/></svg>
+      Continuer avec Google
+    </button>
+
+    <div class="auth-toggle" id="authToggle">Pas encore de compte ? <span id="switchAuth">Créer un compte</span></div>
+  </div>
+</div>
+
+<!-- ===== PUBLISH MODAL ===== -->
+<div class="overlay" id="publishOverlay">
+  <div class="modal glass">
+    <div class="modal-close" id="closePublish">✕</div>
+    <h2>Publier un objet</h2>
+    <div class="modal-sub">Dis ce que tu proposes — sans prix, juste entre voisins.</div>
+    <div class="form-error" id="publishError"></div>
+
+    <div class="field">
+      <label>Type d'offre</label>
+      <div class="type-toggle">
+        <div class="type-opt active" data-type="pret">🤝 Prêt</div>
+        <div class="type-opt" data-type="echange">🔄 Échange</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Titre de l'objet</label>
+      <input type="text" id="pubTitle" placeholder="Ex : Perceuse Bosch, robe de soirée noire...">
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea id="pubDesc" placeholder="État de l'objet, conditions, ce que tu veux en échange..."></textarea>
+    </div>
+
+    <div class="field" id="durationField">
+      <label>Durée du prêt</label>
+      <input type="text" id="pubDuration" placeholder="Ex : 3 jours, 1 semaine, 1 week-end...">
+    </div>
+
+    <div class="field">
+      <label>Photo</label>
+      <div class="img-drop" id="imgDrop">
+        <span id="imgDropText">📷 Ajouter une photo</span>
+        <input type="file" id="pubImage" accept="image/*">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Localisation</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="pubLocation" placeholder="Clique sur le bouton pour te localiser" readonly style="flex:1;">
+        <button type="button" class="btn btn-ghost" id="btnUseLocation" style="flex-shrink:0;">📍 Me localiser</button>
+      </div>
+      <div id="pubLocationHint" style="font-size:0.75rem; color:var(--text-faint); margin-top:6px;"></div>
+    </div>
+
+    <button class="btn btn-solid btn-full" id="btnPublishSubmit">Publier l'objet</button>
+  </div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal wide glass">
+    <div class="modal-close" id="closeDetail">✕</div>
+    <img class="detail-img" id="detailImg" style="display:none;">
+    <div id="detailBadge"></div>
+    <h2 id="detailTitle" style="margin-top:10px;"></h2>
+    <div class="detail-owner">
+      <div class="avatar" id="detailAvatar">?</div>
+      <div>
+        <div class="detail-owner-name" id="detailOwnerName"></div>
+        <div class="detail-owner-loc" id="detailOwnerLoc"></div>
+      </div>
+    </div>
+    <div class="detail-info" id="detailInfo"></div>
+    <div class="detail-desc" id="detailDesc"></div>
+
+    <div class="chat-box glass" id="chatBox">
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Écris à la personne...">
+        <button class="btn btn-solid" id="btnSendMsg">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, signOut, updateProfile,
+  GoogleAuthProvider, signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import {
+  getDatabase, ref, push, set, get, onValue, query, orderByChild, child
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCRnYxUwgSGfyCLMc1xwUInN0rIkj6VS5I",
+  authDomain: "drop-772d1.firebaseapp.com",
+  projectId: "drop-772d1",
+  storageBucket: "drop-772d1.firebasestorage.app",
+  messagingSenderId: "609867426895",
+  appId: "1:609867426895:web:31b15715a9f0d646544e3a",
+  measurementId: "G-KQ35S4N85B"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let currentUser = null;
+let userLoc = null; // {lat, lng}
+let allObjects = [];
+let authMode = "login"; // or "signup"
+let publishType = "pret";
+let pubImageBase64 = null;
+let activeDetailId = null;
+
+/* ---------------- Toast ---------------- */
+function toast(msg, type="ok"){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast glass';
+  el.style.color = type === 'error' ? '#f2a49d' : '#f3f4f6';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, 3500);
+}
+
+/* ---------------- Modal helpers ---------------- */
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target === ov) ov.classList.remove('active'); });
+});
+
+/* ---------------- Auth UI ---------------- */
+const btnLogin = document.getElementById('btnLogin');
+const btnPublishNav = document.getElementById('btnPublishNav');
+const fabPublish = document.getElementById('fabPublish');
+const navActions = document.getElementById('navActions');
+
+btnLogin.addEventListener('click', ()=>{ authMode='login'; renderAuthMode(); openModal('authOverlay'); });
+document.getElementById('closeAuth').addEventListener('click', ()=>closeModal('authOverlay'));
+document.getElementById('switchAuth').addEventListener('click', ()=>{
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  renderAuthMode();
+});
+
+function renderAuthMode(){
+  const isSignup = authMode === 'signup';
+  document.getElementById('authTitle').textContent = isSignup ? 'Rejoins DROP' : 'Content de te revoir';
+  document.getElementById('authSub').textContent = isSignup ? 'Crée ton compte pour prêter et emprunter.' : 'Connecte-toi pour emprunter, échanger et publier.';
+  document.getElementById('fieldName').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('btnAuthSubmit').textContent = isSignup ? 'Créer mon compte' : 'Se connecter';
+  document.getElementById('authToggle').innerHTML = isSignup
+    ? `Déjà un compte ? <span id="switchAuth2">Se connecter</span>`
+    : `Pas encore de compte ? <span id="switchAuth2">Créer un compte</span>`;
+  document.getElementById('authError').classList.remove('show');
+  const s2 = document.getElementById('switchAuth2');
+  if(s2) s2.addEventListener('click', ()=>{ authMode = isSignup ? 'login' : 'signup'; renderAuthMode(); });
+}
+
+function showAuthError(msg){
+  const el = document.getElementById('authError');
+  el.textContent = msg; el.classList.add('show');
+}
+
+document.getElementById('btnAuthSubmit').addEventListener('click', async ()=>{
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPassword').value;
+  const name = document.getElementById('authName').value.trim();
+  if(!email || !pass){ showAuthError("Remplis email et mot de passe."); return; }
+  try{
+    if(authMode === 'signup'){
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      if(name) await updateProfile(cred.user, { displayName: name });
+      await set(ref(db, 'users/' + cred.user.uid), {
+        name: name || email.split('@')[0], email, createdAt: Date.now()
+      });
+      toast("Bienvenue sur DROP !");
+    } else {
+      await signInWithEmailAndPassword(auth, email, pass);
+      toast("Connecté.");
+    }
+    closeModal('authOverlay');
+  }catch(err){
+    showAuthError(translateAuthError(err.code));
+  }
+});
+
+document.getElementById('btnGoogle').addEventListener('click', async ()=>{
+  try{
+    const provider = new GoogleAuthProvider();
+    const res = await signInWithPopup(auth, provider);
+    const u = res.user;
+    const snap = await get(ref(db, 'users/' + u.uid));
+    if(!snap.exists()){
+      await set(ref(db, 'users/' + u.uid), {
+        name: u.displayName || 'Utilisateur', email: u.email, photoURL: u.photoURL || null, createdAt: Date.now()
+      });
+    }
+    toast("Connecté avec Google.");
+    closeModal('authOverlay');
+  }catch(err){
+    showAuthError(translateAuthError(err.code));
+  }
+});
+
+function translateAuthError(code){
+  const map = {
+    'auth/email-already-in-use': "Cet email est déjà utilisé.",
+    'auth/invalid-email': "Adresse email invalide.",
+    'auth/weak-password': "Mot de passe trop faible (6 caractères min).",
+    'auth/user-not-found': "Aucun compte avec cet email.",
+    'auth/wrong-password': "Mot de passe incorrect.",
+    'auth/invalid-credential': "Email ou mot de passe incorrect.",
+    'auth/popup-closed-by-user': "Fenêtre Google fermée."
+  };
+  return map[code] || "Une erreur est survenue. Réessaie.";
+}
+
+onAuthStateChanged(auth, (user)=>{
+  currentUser = user;
+  if(user){
+    navActions.innerHTML = `
+      <button class="btn btn-ghost" id="btnPublishNav2"><span>Publier</span></button>
+      <div class="avatar" id="userAvatar"></div>
+      <button class="btn btn-danger" id="btnLogout">Déconnexion</button>
+    `;
+    const av = document.getElementById('userAvatar');
+    if(user.photoURL){ av.innerHTML = `<img src="${user.photoURL}">`; }
+    else{ av.textContent = (user.displayName || user.email || '?')[0].toUpperCase(); }
+    document.getElementById('btnPublishNav2').addEventListener('click', ()=>openModal('publishOverlay'));
+    document.getElementById('btnLogout').addEventListener('click', async ()=>{ await signOut(auth); toast("Déconnecté."); });
+  } else {
+    navActions.innerHTML = `
+      <button class="btn btn-ghost" id="btnLogin">Connexion</button>
+      <button class="btn btn-solid" id="btnPublishNav">Publier</button>
+    `;
+    document.getElementById('btnLogin').addEventListener('click', ()=>{ authMode='login'; renderAuthMode(); openModal('authOverlay'); });
+    document.getElementById('btnPublishNav').addEventListener('click', requirePublishAuth);
+  }
+});
+
+function requirePublishAuth(){
+  if(!currentUser){ authMode='login'; renderAuthMode(); openModal('authOverlay'); toast("Connecte-toi pour publier un objet.", "error"); return; }
+  openModal('publishOverlay');
+}
+fabPublish.addEventListener('click', requirePublishAuth);
+
+/* ---------------- Geolocation ---------------- */
+function requestLocation(){
+  if(!navigator.geolocation){ return; }
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const st = document.getElementById('locStatus');
+      st.classList.remove('off');
+      document.getElementById('locStatusText').textContent = "Localisation active";
+      renderGrid(document.getElementById('searchInput').value.trim());
+    },
+    ()=>{ document.getElementById('locStatusText').textContent = "Localisation refusée"; },
+    { timeout: 8000 }
+  );
+}
+requestLocation();
+
+function haversine(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* ---------------- Publish form ---------------- */
+document.getElementById('closePublish').addEventListener('click', ()=>closeModal('publishOverlay'));
+
+document.querySelectorAll('.type-opt').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('active'));
+    opt.classList.add('active');
+    publishType = opt.dataset.type;
+    document.getElementById('durationField').style.display = publishType === 'pret' ? 'block' : 'none';
+  });
+});
+
+function handleImageChange(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      const maxW = 900;
+      const scale = Math.min(1, maxW / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      pubImageBase64 = canvas.toDataURL('image/jpeg', 0.72);
+      const drop = document.getElementById('imgDrop');
+      drop.innerHTML = `<img src="${pubImageBase64}"><input type="file" id="pubImage" accept="image/*">`;
+      document.getElementById('pubImage').addEventListener('change', handleImageChange);
+      document.getElementById('imgDrop').onclick = ()=>document.getElementById('pubImage').click();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+document.getElementById('imgDrop').addEventListener('click', ()=>document.getElementById('pubImage').click());
+document.getElementById('pubImage').addEventListener('change', handleImageChange);
+
+function showPublishError(msg){
+  const el = document.getElementById('publishError');
+  el.textContent = msg; el.classList.add('show');
+}
+
+let pubLat = null, pubLng = null;
+
+document.getElementById('btnUseLocation').addEventListener('click', ()=>{
+  const hint = document.getElementById('pubLocationHint');
+  const btn = document.getElementById('btnUseLocation');
+
+  if(!window.isSecureContext){
+    hint.style.color = 'var(--danger)';
+    hint.textContent = "La géolocalisation nécessite HTTPS. Ouvre le site via une adresse https:// (ex : Firebase Hosting), pas en fichier local.";
+    return;
+  }
+  if(!navigator.geolocation){
+    hint.style.color = 'var(--danger)';
+    hint.textContent = "Ton navigateur ne supporte pas la géolocalisation.";
+    return;
+  }
+
+  btn.textContent = "Localisation...";
+  hint.style.color = 'var(--text-faint)';
+  hint.textContent = "";
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos)=>{
+      pubLat = pos.coords.latitude;
+      pubLng = pos.coords.longitude;
+      userLoc = { lat: pubLat, lng: pubLng };
+      btn.textContent = "📍 Me localiser";
+      document.getElementById('pubLocation').value = `${pubLat.toFixed(4)}, ${pubLng.toFixed(4)}`;
+      try{
+        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pubLat}&longitude=${pubLng}&localityLanguage=fr`);
+        const geo = await res.json();
+        const label = [geo.locality, geo.principalSubdivision].filter(Boolean).join(', ');
+        if(label){ document.getElementById('pubLocation').value = label; }
+      }catch(e){ /* garde les coordonnées si le service échoue */ }
+      hint.style.color = 'var(--ok)';
+      hint.textContent = "Position enregistrée.";
+    },
+    (err)=>{
+      btn.textContent = "📍 Me localiser";
+      hint.style.color = 'var(--danger)';
+      if(err.code === 1) hint.textContent = "Tu as refusé l'accès à ta position. Autorise-la dans les réglages du navigateur (icône cadenas à côté de l'URL).";
+      else if(err.code === 2) hint.textContent = "Position indisponible pour le moment. Réessaie.";
+      else hint.textContent = "La demande a expiré. Réessaie.";
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+});
+
+document.getElementById('btnPublishSubmit').addEventListener('click', async ()=>{
+  document.getElementById('publishError').classList.remove('show');
+  if(!currentUser){ toast("Connecte-toi d'abord.", "error"); return; }
+  const title = document.getElementById('pubTitle').value.trim();
+  const desc = document.getElementById('pubDesc').value.trim();
+  const duration = document.getElementById('pubDuration').value.trim();
+
+  if(!title || !desc){ showPublishError("Titre et description sont obligatoires."); return; }
+  if(publishType === 'pret' && !duration){ showPublishError("Indique une durée de prêt."); return; }
+
+  const finalize = async (lat, lng, locLabel) => {
+    try{
+      const newRef = push(ref(db, 'objects'));
+      await set(newRef, {
+        ownerId: currentUser.uid,
+        ownerName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
+        title, description: desc, type: publishType,
+        duration: publishType === 'pret' ? duration : null,
+        image: pubImageBase64 || null,
+        lat: lat || null, lng: lng || null,
+        locationLabel: locLabel || "Localisation non précisée",
+        createdAt: Date.now()
+      });
+      toast("Objet publié 🎉");
+      closeModal('publishOverlay');
+      document.getElementById('pubTitle').value='';
+      document.getElementById('pubDesc').value='';
+      document.getElementById('pubDuration').value='';
+      document.getElementById('pubLocation').value='';
+      pubImageBase64 = null;
+      document.getElementById('imgDrop').innerHTML = `<span id="imgDropText">📷 Ajouter une photo</span><input type="file" id="pubImage" accept="image/*">`;
+    }catch(err){
+      console.error(err);
+      if(err.code === 'PERMISSION_DENIED'){
+        showPublishError("Refusé par la base de données (règles Firebase). Vérifie que tes règles sont bien publiées, ou que la photo n'est pas trop lourde.");
+      } else {
+        showPublishError("Erreur : " + (err.message || err.code || "impossible de publier."));
+      }
+    }
+  };
+
+  const locLabel = document.getElementById('pubLocation').value.trim();
+  if(pubLat && pubLng){
+    finalize(pubLat, pubLng, locLabel || "Près de toi");
+  } else if(userLoc){
+    finalize(userLoc.lat, userLoc.lng, locLabel || "Près de toi");
+  } else {
+    showPublishError("Clique sur \"📍 Me localiser\" pour indiquer où se trouve l'objet.");
+  }
+});
+
+/* ---------------- Search ---------------- */
+document.getElementById('btnSearch').addEventListener('click', doSearch);
+document.getElementById('searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click', ()=>{
+    document.getElementById('searchInput').value = c.dataset.chip;
+    doSearch();
+  });
+});
+function doSearch(){
+  const term = document.getElementById('searchInput').value.trim();
+  document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+  renderGrid(term);
+}
+
+/* ---------------- Load objects ---------------- */
+const objectsRef = ref(db, 'objects');
+onValue(objectsRef, (snap)=>{
+  const data = snap.val() || {};
+  allObjects = Object.entries(data).map(([id, v])=>({ id, ...v })).sort((a,b)=>b.createdAt - a.createdAt);
+  renderGrid(document.getElementById('searchInput').value.trim());
+});
+
+function renderGrid(term){
+  const grid = document.getElementById('grid');
+  let list = allObjects.slice();
+
+  if(term){
+    const t = term.toLowerCase();
+    list = list.filter(o => (o.title||'').toLowerCase().includes(t) || (o.description||'').toLowerCase().includes(t));
+    document.getElementById('resultsTitle').textContent = `Résultats pour "${term}"`;
+    document.getElementById('resultsSub').textContent = `${list.length} objet${list.length>1?'s':''} trouvé${list.length>1?'s':''}`;
+  } else {
+    document.getElementById('resultsTitle').textContent = "Autour de toi";
+    document.getElementById('resultsSub').textContent = "Les objets les plus proches disponibles maintenant";
+  }
+
+  list.forEach(o=>{
+    if(userLoc && o.lat && o.lng){ o._dist = haversine(userLoc.lat, userLoc.lng, o.lat, o.lng); }
+    else{ o._dist = null; }
+  });
+  if(userLoc){ list.sort((a,b)=> (a._dist ?? 1e9) - (b._dist ?? 1e9)); }
+
+  if(list.length === 0){
+    grid.innerHTML = `<div class="empty glass" style="grid-column:1/-1;">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <div>Rien par ici pour l'instant.<br>Sois le premier à publier un objet.</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(o=>`
+    <div class="card glass" data-id="${o.id}">
+      ${o.image ? `<img class="card-img" src="${o.image}">` : `<div class="card-img-placeholder"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><path d="M18 2l4 4-9 9H9v-4l9-9z"/></svg></div>`}
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-title">${escapeHtml(o.title)}</div>
+          <div class="badge ${o.type==='pret' ? 'badge-pret' : 'badge-echange'}">${o.type==='pret' ? '🤝 Prêt' : '🔄 Échange'}</div>
+        </div>
+        <div class="card-desc">${escapeHtml(o.description||'')}</div>
+        <div class="card-meta">
+          <div class="card-owner">👤 ${escapeHtml(o.ownerName||'Utilisateur')}</div>
+          <div>${o._dist !== null ? `📍 ${o._dist < 1 ? Math.round(o._dist*1000)+' m' : o._dist.toFixed(1)+' km'}` : (o.locationLabel || '')}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click', ()=>openDetail(card.dataset.id));
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ---------------- Detail + chat ---------------- */
+document.getElementById('closeDetail').addEventListener('click', ()=>{ closeModal('detailOverlay'); activeDetailId = null; });
+
+function openDetail(id){
+  const o = allObjects.find(x=>x.id === id);
+  if(!o) return;
+  activeDetailId = id;
+
+  const imgEl = document.getElementById('detailImg');
+  if(o.image){ imgEl.src = o.image; imgEl.style.display='block'; } else { imgEl.style.display='none'; }
+
+  document.getElementById('detailBadge').innerHTML = `<div class="badge ${o.type==='pret'?'badge-pret':'badge-echange'}">${o.type==='pret'?'🤝 Prêt':'🔄 Échange'}</div>`;
+  document.getElementById('detailTitle').textContent = o.title;
+  document.getElementById('detailAvatar').textContent = (o.ownerName||'?')[0].toUpperCase();
+  document.getElementById('detailOwnerName').textContent = o.ownerName || 'Utilisateur';
+  document.getElementById('detailOwnerLoc').textContent = o._dist !== null ? `À ${o._dist < 1 ? Math.round(o._dist*1000)+' m' : o._dist.toFixed(1)+' km'} de toi` : (o.locationLabel || 'Localisation inconnue');
+  document.getElementById('detailDesc').textContent = o.description || '';
+
+  let info = '';
+  if(o.type === 'pret' && o.duration) info += `<div class="info-pill">⏱ Durée : ${escapeHtml(o.duration)}</div>`;
+  info += `<div class="info-pill">📅 Publié le ${new Date(o.createdAt).toLocaleDateString('fr-FR')}</div>`;
+  document.getElementById('detailInfo').innerHTML = info;
+
+  document.getElementById('chatBox').style.display = currentUser ? 'block' : 'none';
+  if(currentUser){ loadChat(id); }
+
+  openModal('detailOverlay');
+}
+
+function loadChat(objectId){
+  const chatRef = ref(db, 'messages/' + objectId);
+  onValue(chatRef, (snap)=>{
+    if(activeDetailId !== objectId) return;
+    const data = snap.val() || {};
+    const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts);
+    const box = document.getElementById('chatMsgs');
+    box.innerHTML = msgs.map(m=>`
+      <div class="msg ${m.uid === currentUser.uid ? 'mine' : 'theirs'}">
+        <div style="font-size:0.68rem; opacity:0.6; margin-bottom:2px;">${escapeHtml(m.name)}</div>
+        ${escapeHtml(m.text)}
+      </div>
+    `).join('') || `<div style="color:var(--text-faint); font-size:0.82rem; text-align:center; padding:10px;">Envoie le premier message pour cet objet.</div>`;
+    box.scrollTop = box.scrollHeight;
+  });
+}
+
+document.getElementById('btnSendMsg').addEventListener('click', sendMsg);
+document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendMsg(); });
+async function sendMsg(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text || !activeDetailId || !currentUser) return;
+  const msgRef = push(ref(db, 'messages/' + activeDetailId));
+  await set(msgRef, {
+    uid: currentUser.uid,
+    name: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
+    text, ts: Date.now()
+  });
+  input.value = '';
+}
+</script>
+</body>
+</html>
